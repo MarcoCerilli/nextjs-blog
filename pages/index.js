@@ -2,8 +2,21 @@ import Head from "next/head";
 import Layout, { siteTitle } from "../components/layout";
 import Image from "next/image";
 import utilStyles from "../styles/utils.module.css"; // Ho corretto il percorso se questo è index.js
+import { getSortedPostsData } from "../lib/posts";
+import { Date } from "../components/date";
+import Link from "next/link";
 
-export default function Home() {
+
+export async function getStaticProps() {
+  const allPostsData = getSortedPostsData();
+  return {
+    props: {
+      allPostsData,
+    },
+  };
+}
+
+export default function Home({ allPostsData }) {
   return (
     <Layout home>
       <Head>
@@ -15,6 +28,20 @@ export default function Home() {
           (Questo è un sito di esempio – costruirai un sito come questo nel{' '}
           <a href="https://nextjs.org/learn">nostro tutorial di Next.js</a>.)
         </p>
+      </section>
+      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
+        <h2 className={utilStyles.headingLg}>Blog</h2>
+        <ul className={utilStyles.list}>
+          {allPostsData.map(({ id, date, title }) => (
+            <li className={utilStyles.listItem} key={id}>
+              <Link href={`/posts/${id}`}>{title}</Link>
+              <br />
+              <small className={utilStyles.lightText}>
+                <Date dateString={date} />
+              </small>
+            </li>
+          ))}
+        </ul>
       </section>
     </Layout>
   );
